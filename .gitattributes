@@ -1,0 +1,11 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Lockfiles
+pnpm-lock.yaml linguist-generated
+
+# Agent / tooling configuration
+**/.agents/** linguist-vendored
+.claude/** linguist-vendored
+.opencode/** linguist-vendored
+.letta/** linguist-vendored

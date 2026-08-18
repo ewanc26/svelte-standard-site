@@ -75,7 +75,8 @@
 		"svelte": "^5.0.0"
 	},
 	"dependencies": {
-		"@atproto/api": "^0.18.16",
+		"@bsky/sdk": "latest",
+		"@atproto/lex": "^0.1.4",
 		"@ewanc26/atproto": "workspace:*",
 		"@ewanc26/tid": "workspace:*",
 		"@ewanc26/utils": "workspace:*",

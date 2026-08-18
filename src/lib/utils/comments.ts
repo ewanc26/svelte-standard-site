@@ -1,21 +1,5 @@
-/**
- * Comments utilities for fetching Bluesky replies
- *
- * Fetches threaded replies from Bluesky to display as comments on your blog.
- *
- * @example
- * ```ts
- * import { fetchComments } from 'svelte-standard-site/comments';
- *
- * const comments = await fetchComments({
- *   bskyPostUri: 'at://did:plc:xxx/app.bsky.feed.post/abc123',
- *   canonicalUrl: 'https://yourblog.com/posts/my-post',
- *   maxDepth: 3,
- * });
- * ```
- */
-
-import { AtpAgent } from '@atproto/api';
+import { Client } from '@atproto/lex';
+import { app } from '@bsky/sdk/lexicons';
 
 export interface CommentAuthor {
 	did: string;
@@ -37,19 +21,12 @@ export interface Comment {
 }
 
 export interface FetchCommentsOptions {
-	/** AT-URI of the announcement post (e.g., at://did:plc:xxx/app.bsky.feed.post/abc123) */
 	bskyPostUri: string;
-	/** Optional canonical URL to search for mentions */
 	canonicalUrl?: string;
-	/** Maximum depth for nested replies (default: 3) */
 	maxDepth?: number;
-	/** Optional fetch function for SSR */
 	fetchFn?: typeof fetch;
 }
 
-/**
- * Parse an AT-URI to extract components
- */
 function parseAtUri(uri: string): { did: string; collection: string; rkey: string } | null {
 	const match = uri.match(/^at:\/\/([^/]+)\/([^/]+)\/(.+)$/);
 	if (!match) return null;
@@ -60,23 +37,20 @@ function parseAtUri(uri: string): { did: string; collection: string; rkey: strin
 	};
 }
 
-/**
- * Fetch a single thread of replies
- */
 async function fetchThread(
-	agent: AtpAgent,
+	client: Client,
 	uri: string,
 	maxDepth: number,
 	currentDepth = 0
 ): Promise<Comment | null> {
 	try {
-		const response = await agent.getPostThread({
+		const response = await client.call(app.bsky.feed.getPostThread, {
 			uri,
 			depth: maxDepth - currentDepth,
 			parentHeight: 0
 		});
 
-		const thread = response.data.thread;
+		const thread = response.thread;
 
 		if (thread.$type !== 'app.bsky.feed.defs#threadViewPost') {
 			return null;
@@ -84,7 +58,6 @@ async function fetchThread(
 
 		const post = thread.post;
 
-		// Build comment object
 		const comment: Comment = {
 			uri: post.uri,
 			cid: post.cid,
@@ -102,12 +75,11 @@ async function fetchThread(
 			replies: []
 		};
 
-		// Process replies if within depth limit
 		if (thread.replies && currentDepth < maxDepth) {
 			for (const reply of thread.replies) {
 				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
 					const replyComment = await fetchThread(
-						agent,
+						client,
 						reply.post.uri,
 						maxDepth,
 						currentDepth + 1
@@ -126,16 +98,9 @@ async function fetchThread(
 	}
 }
 
-/**
- * Fetch comments for a blog post
- *
- * @param options - Configuration options
- * @returns Array of top-level comments with nested replies
- */
 export async function fetchComments(options: FetchCommentsOptions): Promise<Comment[]> {
 	const { bskyPostUri, canonicalUrl, maxDepth = 3 } = options;
 
-	// Parse the post URI
 	const parsed = parseAtUri(bskyPostUri);
 	if (!parsed) {
 		console.error('Invalid AT-URI:', bskyPostUri);
@@ -143,17 +108,14 @@ export async function fetchComments(options: FetchCommentsOptions): Promise<Comm
 	}
 
 	try {
-		// Create agent
-		const agent = new AtpAgent({ service: 'https://public.api.bsky.app' });
+		const client = new Client('https://public.api.bsky.app');
 
-		// Fetch the main thread
-		const mainComment = await fetchThread(agent, bskyPostUri, maxDepth, 0);
+		const mainComment = await fetchThread(client, bskyPostUri, maxDepth, 0);
 
 		if (!mainComment || !mainComment.replies) {
 			return [];
 		}
 
-		// Return only the replies (not the original post)
 		return mainComment.replies;
 	} catch (error) {
 		console.error('Failed to fetch comments:', error);
@@ -161,29 +123,22 @@ export async function fetchComments(options: FetchCommentsOptions): Promise<Comm
 	}
 }
 
-/**
- * Search for mentions of a URL and fetch those threads as comments
- *
- * This is useful if people share your blog post on Bluesky without
- * replying to a specific announcement post.
- */
 export async function fetchMentionComments(
 	canonicalUrl: string,
 	maxDepth = 3
 ): Promise<Comment[]> {
 	try {
-		const agent = new AtpAgent({ service: 'https://public.api.bsky.app' });
+		const client = new Client('https://public.api.bsky.app');
 
-		// Search for posts mentioning the URL
-		const searchResponse = await agent.app.bsky.feed.searchPosts({
+		const searchResponse = await client.call(app.bsky.feed.searchPosts, {
 			q: canonicalUrl,
 			limit: 25
 		});
 
 		const comments: Comment[] = [];
 
-		for (const post of searchResponse.data.posts) {
-			const comment = await fetchThread(agent, post.uri, maxDepth, 0);
+		for (const post of searchResponse.posts) {
+			const comment = await fetchThread(client, post.uri, maxDepth, 0);
 			if (comment) {
 				comments.push(comment);
 			}
@@ -196,9 +151,6 @@ export async function fetchMentionComments(
 	}
 }
 
-/**
- * Format a relative time string (e.g., "2 hours ago")
- */
 export function formatRelativeTime(dateString: string): string {
 	const date = new Date(dateString);
 	const now = new Date();

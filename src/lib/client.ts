@@ -8,10 +8,8 @@ import type {
 import { cache } from './utils/cache.js';
 import { resolveIdentity, withFallback, buildPdsBlobUrl } from './utils/agents.js';
 import { parseAtUri, atUriToHttps } from './utils/at-uri.js';
+import { com } from '@bsky/sdk/lexicons';
 
-/**
- * Main client for interacting with site.standard.* records
- */
 export class SiteStandardClient {
 	private config: Required<SiteStandardConfig>;
 	private pdsEndpoint: string | null = null;
@@ -23,13 +21,9 @@ export class SiteStandardClient {
 			cacheTTL: config.cacheTTL ?? 5 * 60 * 1000
 		};
 
-		// Set cache TTL
 		cache.setDefaultTTL(this.config.cacheTTL);
 	}
 
-	/**
-	 * Resolve and cache PDS endpoint
-	 */
 	private async resolvePDS(fetchFn?: typeof fetch): Promise<string> {
 		if (this.pdsEndpoint) return this.pdsEndpoint;
 
@@ -43,9 +37,6 @@ export class SiteStandardClient {
 		return this.pdsEndpoint;
 	}
 
-	/**
-	 * Convert a blob object to a URL string
-	 */
 	private async getBlobUrl(blob: any, fetchFn?: typeof fetch): Promise<string | undefined> {
 		try {
 			const cid = blob?.ref?.$link || blob?.cid;
@@ -59,12 +50,6 @@ export class SiteStandardClient {
 		}
 	}
 
-	/**
-	 * Fetch a single publication by rkey
-	 * @param rkey - Record key for the publication
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Publication record or null if not found
-	 */
 	async fetchPublication(
 		rkey: string,
 		fetchFn?: typeof fetch
@@ -76,13 +61,13 @@ export class SiteStandardClient {
 		try {
 			const result = await withFallback(
 				this.config.did,
-				async (agent) => {
-					const response = await agent.com.atproto.repo.getRecord({
+				async (client) => {
+					const response = await client.call(com.atproto.repo.getRecord, {
 						repo: this.config.did,
 						collection: 'site.standard.publication',
 						rkey
 					});
-					return response.data;
+					return response;
 				},
 				fetchFn
 			);
@@ -91,7 +76,6 @@ export class SiteStandardClient {
 
 			const pubValue = result.value as any;
 
-			// Build the publication object with converted blob URLs
 			const record: AtProtoRecord<Publication> = {
 				uri: result.uri,
 				cid: result.cid || '',
@@ -114,11 +98,6 @@ export class SiteStandardClient {
 		}
 	}
 
-	/**
-	 * Fetch all publications for the configured DID
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Array of publication records
-	 */
 	async fetchAllPublications(fetchFn?: typeof fetch): Promise<AtProtoRecord<Publication>[]> {
 		const cacheKey = `publications:${this.config.did}:all`;
 		const cached = cache.get<AtProtoRecord<Publication>[]>(cacheKey);
@@ -131,20 +110,19 @@ export class SiteStandardClient {
 			do {
 				const records = await withFallback(
 					this.config.did,
-					async (agent) => {
-						const response = await agent.com.atproto.repo.listRecords({
+					async (client) => {
+						const response = await client.call(com.atproto.repo.listRecords, {
 							repo: this.config.did,
 							collection: 'site.standard.publication',
 							limit: 100,
 							cursor
 						});
-						cursor = response.data.cursor;
-						return response.data.records;
+						cursor = response.cursor;
+						return response.records;
 					},
 					fetchFn
 				);
 
-				// Convert each record with blob URLs
 				for (const record of records) {
 					const pubValue = record.value as any;
 					const pub: AtProtoRecord<Publication> = {
@@ -172,12 +150,6 @@ export class SiteStandardClient {
 		}
 	}
 
-	/**
-	 * Fetch a single document by rkey
-	 * @param rkey - Record key for the document
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Document record or null if not found
-	 */
 	async fetchDocument(
 		rkey: string,
 		fetchFn?: typeof fetch
@@ -189,13 +161,13 @@ export class SiteStandardClient {
 		try {
 			const result = await withFallback(
 				this.config.did,
-				async (agent) => {
-					const response = await agent.com.atproto.repo.getRecord({
+				async (client) => {
+					const response = await client.call(com.atproto.repo.getRecord, {
 						repo: this.config.did,
 						collection: 'site.standard.document',
 						rkey
 					});
-					return response.data;
+					return response;
 				},
 				fetchFn
 			);
@@ -204,7 +176,6 @@ export class SiteStandardClient {
 
 			const docValue = result.value as any;
 
-			// Build the document object with converted blob URLs
 			const record: AtProtoRecord<Document> = {
 				uri: result.uri,
 				cid: result.cid || '',
@@ -234,11 +205,6 @@ export class SiteStandardClient {
 		}
 	}
 
-	/**
-	 * Fetch all documents for the configured DID
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Array of document records
-	 */
 	async fetchAllDocuments(fetchFn?: typeof fetch): Promise<AtProtoRecord<Document>[]> {
 		const cacheKey = `documents:${this.config.did}:all`;
 		const cached = cache.get<AtProtoRecord<Document>[]>(cacheKey);
@@ -251,20 +217,19 @@ export class SiteStandardClient {
 			do {
 				const records = await withFallback(
 					this.config.did,
-					async (agent) => {
-						const response = await agent.com.atproto.repo.listRecords({
+					async (client) => {
+						const response = await client.call(com.atproto.repo.listRecords, {
 							repo: this.config.did,
 							collection: 'site.standard.document',
 							limit: 100,
 							cursor
 						});
-						cursor = response.data.cursor;
-						return response.data.records;
+						cursor = response.cursor;
+						return response.records;
 					},
 					fetchFn
 				);
 
-				// Convert each record with blob URLs
 				for (const record of records) {
 					const docValue = record.value as any;
 					const doc: AtProtoRecord<Document> = {
@@ -291,7 +256,6 @@ export class SiteStandardClient {
 				}
 			} while (cursor);
 
-			// Sort by publishedAt, newest first
 			allRecords.sort(
 				(a, b) => new Date(b.value.publishedAt).getTime() - new Date(a.value.publishedAt).getTime()
 			);
@@ -304,12 +268,6 @@ export class SiteStandardClient {
 		}
 	}
 
-	/**
-	 * Fetch documents for a specific publication
-	 * @param publicationUri - AT URI of the publication
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Array of document records belonging to the publication
-	 */
 	async fetchDocumentsByPublication(
 		publicationUri: string,
 		fetchFn?: typeof fetch
@@ -318,12 +276,6 @@ export class SiteStandardClient {
 		return allDocs.filter((doc) => doc.value.site === publicationUri);
 	}
 
-	/**
-	 * Fetch a record by AT URI
-	 * @param atUri - Full AT URI (e.g., at://did:plc:xxx/site.standard.publication/rkey)
-	 * @param fetchFn - Optional fetch function for SSR
-	 * @returns Record or null if not found
-	 */
 	async fetchByAtUri<T = Publication | Document>(
 		atUri: string,
 		fetchFn?: typeof fetch
@@ -343,26 +295,15 @@ export class SiteStandardClient {
 		return null;
 	}
 
-	/**
-	 * Clear all cached data
-	 */
 	clearCache(): void {
 		cache.clear();
 	}
 
-	/**
-	 * Get the resolved PDS endpoint
-	 */
 	async getPDS(fetchFn?: typeof fetch): Promise<string> {
 		return this.resolvePDS(fetchFn);
 	}
 }
 
-/**
- * Create a new SiteStandardClient instance
- * @param config - Configuration object
- * @returns Configured client instance
- */
 export function createClient(config: SiteStandardConfig): SiteStandardClient {
 	return new SiteStandardClient(config);
 }

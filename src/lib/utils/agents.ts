@@ -1,11 +1,8 @@
-import { AtpAgent } from '@atproto/api';
+import { Client } from '@atproto/lex';
 import type { ResolvedIdentity } from '../types.js';
 import { cache } from './cache.js';
 
-/**
- * Creates an AtpAgent with optional fetch function injection
- */
-export function createAgent(service: string, fetchFn?: typeof fetch): AtpAgent {
+export function createAgent(service: string, fetchFn?: typeof fetch): Client {
 	const wrappedFetch = fetchFn
 		? async (url: URL | RequestInfo, init?: RequestInit) => {
 				const urlStr = url instanceof URL ? url.toString() : url;
@@ -24,18 +21,9 @@ export function createAgent(service: string, fetchFn?: typeof fetch): AtpAgent {
 			}
 		: undefined;
 
-	return new AtpAgent({
-		service,
-		...(wrappedFetch && { fetch: wrappedFetch })
-	});
+	return new Client(service, { fetch: wrappedFetch });
 }
 
-/**
- * Resolves a DID to find its PDS endpoint using Slingshot
- * @param did - DID to resolve
- * @param fetchFn - Optional fetch function for SSR
- * @returns Resolved identity with PDS endpoint
- */
 export async function resolveIdentity(
 	did: string,
 	fetchFn?: typeof fetch
@@ -65,26 +53,14 @@ export async function resolveIdentity(
 	return data;
 }
 
-/**
- * Gets or creates a PDS-specific agent
- * @param did - DID to resolve PDS for
- * @param fetchFn - Optional fetch function for SSR
- * @returns AtpAgent configured for the user's PDS
- */
-export async function getPDSAgent(did: string, fetchFn?: typeof fetch): Promise<AtpAgent> {
+export async function getPDSAgent(did: string, fetchFn?: typeof fetch): Promise<Client> {
 	const resolved = await resolveIdentity(did, fetchFn);
 	return createAgent(resolved.pds, fetchFn);
 }
 
-/**
- * Executes a function with automatic fallback
- * @param did - The DID to resolve
- * @param operation - The operation to execute
- * @param fetchFn - Optional fetch function for SSR
- */
 export async function withFallback<T>(
 	did: string,
-	operation: (agent: AtpAgent) => Promise<T>,
+	operation: (client: Client) => Promise<T>,
 	fetchFn?: typeof fetch
 ): Promise<T> {
 	const agents = [
@@ -101,8 +77,8 @@ export async function withFallback<T>(
 
 	for (const getAgent of agents) {
 		try {
-			const agent = await getAgent();
-			return await operation(agent);
+			const client = await getAgent();
+			return await operation(client);
 		} catch (error) {
 			lastError = error;
 		}
@@ -111,13 +87,6 @@ export async function withFallback<T>(
 	throw lastError;
 }
 
-/**
- * Build a PDS blob URL
- * @param pds - PDS endpoint
- * @param did - Repository DID
- * @param cid - Blob CID
- * @returns Full blob URL
- */
 export function buildPdsBlobUrl(pds: string, did: string, cid: string): string {
 	const pdsBase = pds.replace(/\/$/, '');
 	return `${pdsBase}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`;

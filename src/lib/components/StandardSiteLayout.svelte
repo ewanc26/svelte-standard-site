@@ -96,6 +96,24 @@
 						>Ewan Croft</a
 					>.
 				</p>
+				<p class="mt-1">
+					Support:
+					<a
+						href="https://ko-fi.com/ewancroft"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-primary-600 hover:text-primary-700 focus-visible:outline-primary-600 dark:text-primary-400 dark:hover:text-primary-500 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2"
+						>Ko-fi</a
+					>
+					&middot;
+					<a
+						href="https://github.com/sponsors/ewanc26"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-primary-600 hover:text-primary-700 focus-visible:outline-primary-600 dark:text-primary-400 dark:hover:text-primary-500 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2"
+						>GitHub Sponsors</a
+					>
+				</p>
 			</div>
 		</footer>
 	{/if}
