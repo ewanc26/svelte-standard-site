@@ -1,203 +1,87 @@
-# Contributing to svelte-standard-site
+# Contributing to Zincfox
 
-Thank you for your interest in contributing! This document provides guidelines and information for contributors.
+Zincfox is an experimental clean-room C/C++23 Minecraft: Java Edition server.
+The current implementation has an experimental protocol-767 login,
+configuration, and Play-spawn path validated with the MCP client, but no
+general real-client, version, or gameplay compatibility claim.
 
-## Getting Started
+## Before submitting changes
 
-### Prerequisites
+Build and test with the repository's strict warnings enabled:
 
-- Node.js 18 or higher
-- pnpm 8 or higher
-
-### Setup
-
-1. Fork and clone the repository:
-
-```bash
-git clone https://github.com/ewanc26/svelte-standard-site.git
-cd svelte-standard-site
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j
+ctest --test-dir build --output-on-failure
+cmake -S . -B build-san -DCMAKE_BUILD_TYPE=Debug \
+  -DZINCFOX_ENABLE_SANITIZERS=ON
+cmake --build build-san -j
+ctest --test-dir build-san --output-on-failure
 ```
 
-2. Install dependencies:
+Run `clang-format` on changed C/C++ files. New protocol behavior needs positive,
+malformed-input, fragmentation, and boundary coverage. Network behavior must
+remain non-blocking and bounded; prefer fixed-capacity storage, reusable
+buffers, borrowed `std::span` inputs, and explicit ownership.
 
-```bash
-pnpm install
+For the real-client regression path, set `ZINCFOX_MCP_ROOT` to the local
+`mcp-minecraft` checkout and run the server on `127.0.0.1:25565`:
+
+```sh
+ZINCFOX_MCP_ROOT=/path/to/mcp-minecraft node test/client_regression.mjs
 ```
 
-3. Create a `.env` file:
+The harness uses two 1.21.1 clients, verifies both reach Play spawn, checks
+unsigned system-chat delivery, and exercises movement, terrain dig/place, and
+disconnect broadcasts. It uses unique bounded usernames and derives interaction
+coordinates from the generated surface so persisted player state cannot make a
+run accidentally pass or fail. It is a local development check because the MCP
+dependency is intentionally not vendored.
 
-```bash
-cp .env.example .env
-# Edit .env and add your PUBLIC_ATPROTO_DID
-```
+## Protocol and compatibility
 
-4. Start the development server:
+Protocol definitions belong in `src/protocol/` and version-specific behavior
+must remain isolated from transport and game state. Public references used for
+wire formats must be recorded in the change or its documentation. Do not copy
+Mojang code or claim a Minecraft version until a real client path and automated
+regression coverage exist.
 
-```bash
-pnpm dev
-```
+Every new long-lived allocation or queue must document its owner, normal size,
+maximum size, and growth/backpressure rule. The initial networking budget is
+32 connection slots with fixed 8 KiB receive and 128 KiB transmit buffers per slot.
+User-visible errors and connection drops must use a unique hexadecimal code;
+see `docs/error-codes.md`.
 
-## Development Workflow
+All configurable server behavior belongs in the global `zincfox.conf` file.
+New settings need a validated finite range, a documented default, load/save
+tests, and memory/resource documentation where applicable. Dynamic settings
+must resolve to documented finite limits when host information is unavailable.
 
-### Project Structure
+## Commits and pull requests
 
-```
-src/
-├── lib/                      # Library source code
-│   ├── client.ts            # Main client implementation
-│   ├── types.ts             # TypeScript type definitions
-│   ├── index.ts             # Public API exports
-│   ├── components/          # Reusable Svelte components
-│   │   ├── PublicationCard.svelte
-│   │   └── DocumentCard.svelte
-│   ├── config/              # Configuration utilities
-│   │   └── env.ts           # Environment variable handling
-│   └── utils/               # Utility functions
-│       ├── agents.ts        # AT Protocol agent utilities
-│       ├── at-uri.ts        # AT URI parsing utilities
-│       └── cache.ts         # Caching implementation
-└── routes/                  # Demo/showcase pages
-    ├── +page.svelte
-    └── +page.server.ts
-```
+Use a dedicated `feat/<area>` or `fix/<area>` branch; never push feature work
+directly to `main`. Make atomic conventional commits such as
+`feat(protocol): ...`, `fix(net): ...`, or `test(protocol): ...`. Pull
+requests should explain compatibility claims, memory bounds, test commands,
+portability, and any borrowed design or reference material.
 
-### Commands
+## Releases
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build the library
-- `pnpm check` - Run type checking
-- `pnpm format` - Format code with Prettier
-- `pnpm lint` - Check code formatting
-- `pnpm prepack` - Prepare package for publishing
+Zincfox uses strict semantic versions and cuts the next sequential release when
+a substantial tranche is ready. Substantial means a user-visible protocol or
+gameplay change, persistence/world-format change, compatibility claim, public
+interface change, or material resource-budget change; documentation-only,
+test-only, formatting, and internal refactoring changes do not require a
+release unless they alter the published contract.
 
-## Making Changes
+Before cutting a release, audit the commits since the latest tag. Update only
+the `VERSION` line in `CMakeLists.txt`, commit that bump with the finished
+tranche, create a signed annotated `v<major>.<minor>.<patch>` tag on the same
+commit (or an annotated tag if signing is unavailable), push both, and create a
+GitHub release with generated notes. Releases before `v1.0.0` are source-only;
+release artifacts begin with `v1.0.0`. Never skip a version or create a tag or
+release without its matching version commit.
 
-### Code Style
-
-- We use Prettier for code formatting
-- Run `pnpm format` before committing
-- TypeScript strict mode is enabled
-- Follow the existing code structure and patterns
-
-### Commit Messages
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-- `feat:` - New features
-- `fix:` - Bug fixes
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, etc.)
-- `refactor:` - Code refactoring
-- `test:` - Test additions or changes
-- `chore:` - Build process or tooling changes
-
-Example:
-
-```
-feat: add support for custom PDS endpoints
-fix: resolve caching issue with blob URLs
-docs: update README with new examples
-```
-
-### Pull Request Process
-
-1. Create a new branch:
-
-```bash
-git checkout -b feat/your-feature-name
-```
-
-2. Make your changes and commit them:
-
-```bash
-git add .
-git commit -m "feat: add your feature"
-```
-
-3. Push to your fork:
-
-```bash
-git push origin feat/your-feature-name
-```
-
-4. Open a Pull Request on GitHub
-
-5. Ensure:
-   - Code passes type checking (`pnpm check`)
-   - Code is properly formatted (`pnpm format`)
-   - Documentation is updated if needed
-   - Examples are added for new features
-
-## What to Contribute
-
-### Good First Issues
-
-Look for issues labeled `good first issue` for beginner-friendly tasks.
-
-### Areas for Contribution
-
-- **Bug Fixes**: Report and fix bugs
-- **Features**: Implement new features (discuss in an issue first)
-- **Documentation**: Improve or expand documentation
-- **Examples**: Add new usage examples
-- **Components**: Create new reusable components
-- **Tests**: Add or improve test coverage
-- **Performance**: Optimize existing code
-
-## Reporting Bugs
-
-When reporting bugs, please include:
-
-1. A clear description of the issue
-2. Steps to reproduce
-3. Expected behavior
-4. Actual behavior
-5. Environment details (Node version, OS, etc.)
-6. Code samples if applicable
-
-## Feature Requests
-
-For feature requests:
-
-1. Check if the feature already exists or is planned
-2. Open an issue describing:
-   - The problem you're trying to solve
-   - Your proposed solution
-   - Any alternatives you've considered
-   - Examples of the desired behavior
-
-## Code of Conduct
-
-### Our Pledge
-
-We are committed to providing a friendly, safe, and welcoming environment for all contributors.
-
-### Expected Behavior
-
-- Be respectful and inclusive
-- Welcome newcomers
-- Accept constructive criticism gracefully
-- Focus on what's best for the community
-- Show empathy towards others
-
-### Unacceptable Behavior
-
-- Harassment of any kind
-- Discriminatory language or actions
-- Personal attacks
-- Publishing others' private information
-- Other conduct which could reasonably be considered inappropriate
-
-## Questions?
-
-Feel free to:
-
-- Open an issue for questions
-- Start a discussion in GitHub Discussions
-- Reach out to maintainers
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the [AGPL-3.0](./LICENSE).
-
-Thank you for contributing to svelte-standard-site! 🎉
+Zincfox is licensed under the GNU Affero General Public License v3.0. Keep
+license notices and attribution intact when using external references or
+borrowed designs.
