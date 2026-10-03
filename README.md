@@ -113,3 +113,13 @@ If you find this project useful, consider supporting its development:
 ## Licence
 
 AGPL-3.0-only — see the [pkgs monorepo licence](https://github.com/ewanc26/pkgs/blob/main/LICENSE).
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=ewanc26%2Fsvelte-standard-site&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ewanc26/svelte-standard-site&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ewanc26/svelte-standard-site&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ewanc26/svelte-standard-site&type=date&legend=bottom-right" />
+ </picture>
+</a>
