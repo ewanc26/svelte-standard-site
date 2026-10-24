@@ -1,5 +1,15 @@
 import { Client } from '@atproto/lex';
 import { app } from '@bsky/sdk/lexicons';
+import { asAtUri } from './atproto-strings.js';
+
+type ThreadViewPost = Extract<
+	app.bsky.feed.getPostThread.$OutputBody['thread'],
+	{ $type?: 'app.bsky.feed.defs#threadViewPost' }
+>;
+
+function isThreadViewPost(node: { $type?: string }): node is ThreadViewPost {
+	return node.$type === 'app.bsky.feed.defs#threadViewPost';
+}
 
 export interface CommentAuthor {
 	did: string;
@@ -45,14 +55,14 @@ async function fetchThread(
 ): Promise<Comment | null> {
 	try {
 		const response = await client.call(app.bsky.feed.getPostThread, {
-			uri,
+			uri: asAtUri(uri),
 			depth: maxDepth - currentDepth,
 			parentHeight: 0
 		});
 
 		const thread = response.thread;
 
-		if (thread.$type !== 'app.bsky.feed.defs#threadViewPost') {
+		if (!isThreadViewPost(thread)) {
 			return null;
 		}
 
@@ -77,7 +87,7 @@ async function fetchThread(
 
 		if (thread.replies && currentDepth < maxDepth) {
 			for (const reply of thread.replies) {
-				if (reply.$type === 'app.bsky.feed.defs#threadViewPost') {
+				if (isThreadViewPost(reply)) {
 					const replyComment = await fetchThread(
 						client,
 						reply.post.uri,

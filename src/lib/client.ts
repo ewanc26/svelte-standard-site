@@ -9,6 +9,7 @@ import { cache } from './utils/cache.js';
 import { resolveIdentity, withFallback, buildPdsBlobUrl } from './utils/agents.js';
 import { parseAtUri, atUriToHttps } from './utils/at-uri.js';
 import { com } from '@bsky/sdk/lexicons';
+import { asAtIdentifier } from './utils/atproto-strings.js';
 
 export class SiteStandardClient {
 	private config: Required<SiteStandardConfig>;
@@ -63,7 +64,7 @@ export class SiteStandardClient {
 				this.config.did,
 				async (client) => {
 					const response = await client.call(com.atproto.repo.getRecord, {
-						repo: this.config.did,
+						repo: asAtIdentifier(this.config.did),
 						collection: 'site.standard.publication',
 						rkey
 					});
@@ -112,7 +113,7 @@ export class SiteStandardClient {
 					this.config.did,
 					async (client) => {
 						const response = await client.call(com.atproto.repo.listRecords, {
-							repo: this.config.did,
+							repo: asAtIdentifier(this.config.did),
 							collection: 'site.standard.publication',
 							limit: 100,
 							cursor
@@ -163,7 +164,7 @@ export class SiteStandardClient {
 				this.config.did,
 				async (client) => {
 					const response = await client.call(com.atproto.repo.getRecord, {
-						repo: this.config.did,
+						repo: asAtIdentifier(this.config.did),
 						collection: 'site.standard.document',
 						rkey
 					});
@@ -219,7 +220,7 @@ export class SiteStandardClient {
 					this.config.did,
 					async (client) => {
 						const response = await client.call(com.atproto.repo.listRecords, {
-							repo: this.config.did,
+							repo: asAtIdentifier(this.config.did),
 							collection: 'site.standard.document',
 							limit: 100,
 							cursor

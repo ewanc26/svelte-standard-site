@@ -1,16 +1,17 @@
-import { Client } from '@atproto/lex';
-import { PasswordSession } from '@bsky/sdk';
+import { Client, type DidString, type LexMap } from '@atproto/lex';
+import { PasswordSession } from '@atproto/lex-password-session';
 import { com } from '@bsky/sdk/lexicons';
 import type { PublisherConfig, Document, Publication } from './schemas.js';
 import { PublisherConfigSchema, COLLECTIONS } from './schemas.js';
+import { asAtIdentifier, asDid } from './utils/atproto-strings.js';
 
-async function resolveHandle(handle: string): Promise<string> {
+async function resolveHandle(handle: string): Promise<DidString> {
 	const res = await fetch(
 		`https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`
 	);
 	if (!res.ok) throw new Error(`Failed to resolve handle: ${handle}`);
 	const data = (await res.json()) as { did: string };
-	return data.did;
+	return asDid(data.did);
 }
 
 async function getPdsFromDid(did: string): Promise<string> {
@@ -106,9 +107,9 @@ export interface PublishResult {
 
 export class StandardSitePublisher {
 	private client: Client | null = null;
-	private session: unknown | null = null;
+	private session: PasswordSession | null = null;
 	private config: PublisherConfig;
-	private did: string | null = null;
+	private did: DidString | null = null;
 	private pdsUrl: string | null = null;
 
 	constructor(config: Partial<PublisherConfig>) {
@@ -116,10 +117,9 @@ export class StandardSitePublisher {
 	}
 
 	async login(): Promise<void> {
-		let did = this.config.identifier;
-		if (!did.startsWith('did:')) {
-			did = await resolveHandle(this.config.identifier);
-		}
+		const did = this.config.identifier.startsWith('did:')
+			? asDid(this.config.identifier)
+			: await resolveHandle(this.config.identifier);
 		this.did = did;
 
 		if (this.config.service) {
@@ -136,7 +136,7 @@ export class StandardSitePublisher {
 		this.client = new Client(this.session);
 	}
 
-	getDid(): string {
+	getDid(): DidString {
 		if (!this.did) {
 			throw new Error('Not logged in. Call login() first.');
 		}
@@ -183,10 +183,10 @@ export class StandardSitePublisher {
 		const rkey = generateTid();
 
 		const response = await client.call(com.atproto.repo.createRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.DOCUMENT,
 			rkey,
-			record: cleanRecord
+			record: cleanRecord as LexMap
 		});
 
 		return {
@@ -219,10 +219,10 @@ export class StandardSitePublisher {
 		) as Document;
 
 		const response = await client.call(com.atproto.repo.putRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.DOCUMENT,
 			rkey,
-			record: cleanRecord
+			record: cleanRecord as LexMap
 		});
 
 		return {
@@ -236,7 +236,7 @@ export class StandardSitePublisher {
 		const client = this.getClient();
 
 		await client.call(com.atproto.repo.deleteRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.DOCUMENT,
 			rkey
 		});
@@ -263,10 +263,10 @@ export class StandardSitePublisher {
 		const rkey = generateTid();
 
 		const response = await client.call(com.atproto.repo.createRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.PUBLICATION,
 			rkey,
-			record: cleanRecord
+			record: cleanRecord as LexMap
 		});
 
 		return {
@@ -294,10 +294,10 @@ export class StandardSitePublisher {
 		) as Publication;
 
 		const response = await client.call(com.atproto.repo.putRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.PUBLICATION,
 			rkey,
-			record: cleanRecord
+			record: cleanRecord as LexMap
 		});
 
 		return {
@@ -311,7 +311,7 @@ export class StandardSitePublisher {
 		const client = this.getClient();
 
 		await client.call(com.atproto.repo.deleteRecord, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.PUBLICATION,
 			rkey
 		});
@@ -324,7 +324,7 @@ export class StandardSitePublisher {
 		const client = this.getClient();
 
 		const response = await client.call(com.atproto.repo.listRecords, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.DOCUMENT,
 			limit
 		});
@@ -343,7 +343,7 @@ export class StandardSitePublisher {
 		const client = this.getClient();
 
 		const response = await client.call(com.atproto.repo.listRecords, {
-			repo: did,
+			repo: asAtIdentifier(did),
 			collection: COLLECTIONS.PUBLICATION,
 			limit
 		});
