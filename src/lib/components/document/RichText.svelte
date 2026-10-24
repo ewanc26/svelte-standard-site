@@ -1,6 +1,6 @@
 <script lang="ts">
 	import InlineMath from './InlineMath.svelte';
-	import { UnicodeString } from '@atproto/api';
+	import { UnicodeString } from '@bsky/sdk/richtext';
 
 	interface Facet {
 		index: {
