@@ -4,7 +4,7 @@ Guidance for AI coding agents working in **svelte-standard-site**.
 
 ## Project overview
 
-a standard.site publication renderer for SvelteKit.
+A standard.site publication renderer for SvelteKit.
 
 - Language: Svelte
 - Default branch: main
