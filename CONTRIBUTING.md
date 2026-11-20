@@ -1,19 +1,25 @@
-# Contributing to svelte-standard-site
+# Contributing to @ewanc26/svelte-standard-site
 
-a standard.site publication renderer for SvelteKit.
+A SvelteKit library for reading and writing AT Protocol longform content via `site.standard.*` records: design system, publisher, federated Bluesky comments and verification helpers.
 
-## Project context
+## Where to contribute
 
-- Primary language: Svelte
-- Default branch: main
+**This repository is historical context.** The canonical source lives in the [`@ewanc26/pkgs`](https://github.com/ewanc26/pkgs) monorepo under [`packages/svelte-standard-site`](https://github.com/ewanc26/pkgs/tree/main/packages/svelte-standard-site). Please open issues and pull requests there, not here.
 
-## Before submitting changes
+See [pkgs' CONTRIBUTING.md](https://github.com/ewanc26/pkgs/blob/main/CONTRIBUTING.md) for the monorepo workflow and checks.
 
-- Read the README, manifests, and CI workflows before choosing commands.
-- Run the documented formatter, linter, build, and test checks relevant to your change.
-- Keep commits focused and explain compatibility or operational impact.
-- Open changes through a pull request with verification results.
+## Quick reference (from the monorepo)
 
-## Recent direction
+Local commands, run from `packages/svelte-standard-site`:
 
-Recent commits: Replace workspace deps with published versions and align @atproto/lex (#5); Merge branch 'main' of github.com:ewanc26/svelte-standard-site; docs: add Star History chart; docs: tailor contributor and agent guidance (#3); chore: clean up linguist and gitignore rules; Symlink droid/opencode/qwen/rovodev skill dirs to .agents/skills; Move .claude/skills to .agents/skills convention
+```bash
+pnpm build       # svelte-package → dist/
+pnpm check       # svelte-check
+pnpm test        # vitest run
+```
+
+Requires Svelte 5 and SvelteKit 2 (peer dependencies); `zod` alongside the package. Type-safe (Zod validation throughout), SSR-ready via SvelteKit's `fetch`.
+
+## Licence
+
+AGPL-3.0 (see [LICENSE](LICENSE)). Contributions are accepted under the same terms.
