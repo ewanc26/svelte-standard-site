@@ -272,7 +272,10 @@ if (parsed) {
 ### Extract from HTML
 
 ```typescript
-import { extractDocumentLinkFromHtml, extractPublicationLinkFromHtml } from 'svelte-standard-site/verification';
+import {
+	extractDocumentLinkFromHtml,
+	extractPublicationLinkFromHtml
+} from 'svelte-standard-site/verification';
 
 const html = await fetch('https://example.com/post').then((r) => r.text());
 
@@ -296,7 +299,7 @@ sequenceDiagram
     participant You
     participant ATProto
     participant Platform
-    
+
     You->>ATProto: Publish publication
     ATProto->>You: Return AT-URI
     You->>Your Site: Add .well-known endpoint

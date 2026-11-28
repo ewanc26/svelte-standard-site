@@ -36,11 +36,7 @@ export type {
 } from './types.js';
 
 // Schema exports
-export type {
-	PublisherConfig,
-	ReaderConfig,
-	LoaderConfig
-} from './schemas.js';
+export type { PublisherConfig, ReaderConfig, LoaderConfig } from './schemas.js';
 
 export { COLLECTIONS } from './schemas.js';
 

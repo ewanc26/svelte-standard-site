@@ -34,9 +34,9 @@ Requires `svelte >= 5` and `@sveltejs/kit >= 2` as peer dependencies.
 import { createClient } from '@ewanc26/svelte-standard-site';
 
 export const load = async ({ fetch }) => {
-  const client = createClient({ did: 'did:plc:your-did' });
-  const documents = await client.fetchAllDocuments(fetch);
-  return { documents };
+	const client = createClient({ did: 'did:plc:your-did' });
+	const documents = await client.fetchAllDocuments(fetch);
+	return { documents };
 };
 ```
 
@@ -46,8 +46,8 @@ export const load = async ({ fetch }) => {
 import { StandardSitePublisher } from '@ewanc26/svelte-standard-site/publisher';
 
 const publisher = new StandardSitePublisher({
-  identifier: 'you.bsky.social',
-  password: process.env.ATPROTO_APP_PASSWORD
+	identifier: 'you.bsky.social',
+	password: process.env.ATPROTO_APP_PASSWORD
 });
 await publisher.login();
 await publisher.publishDocument({ site, title, content, publishedAt });
@@ -57,28 +57,28 @@ await publisher.publishDocument({ site, title, content, publishedAt });
 
 ```svelte
 <script>
-  import { Comments } from '@ewanc26/svelte-standard-site';
+	import { Comments } from '@ewanc26/svelte-standard-site';
 </script>
 
 <Comments
-  bskyPostUri="at://did:plc:xxx/app.bsky.feed.post/abc"
-  canonicalUrl="https://yourblog.com/posts/my-post"
+	bskyPostUri="at://did:plc:xxx/app.bsky.feed.post/abc"
+	canonicalUrl="https://yourblog.com/posts/my-post"
 />
 ```
 
 ## Entry Points
 
-| Import | Description |
-|--------|-------------|
-| `@ewanc26/svelte-standard-site` | Components, client, stores, types, utilities |
-| `@ewanc26/svelte-standard-site/publisher` | `StandardSitePublisher` for writing records |
-| `@ewanc26/svelte-standard-site/content` | Markdown transformation utilities |
-| `@ewanc26/svelte-standard-site/comments` | Comment fetching utilities |
-| `@ewanc26/svelte-standard-site/verification` | `.well-known` and ownership verification |
-| `@ewanc26/svelte-standard-site/schemas` | Zod schemas and `COLLECTIONS` constant |
-| `@ewanc26/svelte-standard-site/config/env` | `getConfigFromEnv()` SvelteKit helper |
-| `@ewanc26/svelte-standard-site/styles/base.css` | Base CSS |
-| `@ewanc26/svelte-standard-site/styles/themes.css` | Theme CSS |
+| Import                                            | Description                                  |
+| ------------------------------------------------- | -------------------------------------------- |
+| `@ewanc26/svelte-standard-site`                   | Components, client, stores, types, utilities |
+| `@ewanc26/svelte-standard-site/publisher`         | `StandardSitePublisher` for writing records  |
+| `@ewanc26/svelte-standard-site/content`           | Markdown transformation utilities            |
+| `@ewanc26/svelte-standard-site/comments`          | Comment fetching utilities                   |
+| `@ewanc26/svelte-standard-site/verification`      | `.well-known` and ownership verification     |
+| `@ewanc26/svelte-standard-site/schemas`           | Zod schemas and `COLLECTIONS` constant       |
+| `@ewanc26/svelte-standard-site/config/env`        | `getConfigFromEnv()` SvelteKit helper        |
+| `@ewanc26/svelte-standard-site/styles/base.css`   | Base CSS                                     |
+| `@ewanc26/svelte-standard-site/styles/themes.css` | Theme CSS                                    |
 
 ## Development
 

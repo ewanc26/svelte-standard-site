@@ -50,6 +50,7 @@ pnpm check       # Type check
 Record keys for `site.standard.document` and `site.standard.publication` MUST be TIDs. Schema validation will reject anything else.
 
 **TID requirements:**
+
 - 13 characters, base32-sortable charset: `234567abcdefghijklmnopqrstuvwxyz`
 - First char must be `234567abcdefghij` (top bit = 0)
 - Regex: `/^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/`
@@ -70,6 +71,7 @@ See `generateTid()` in `src/lib/publisher.ts` — do not modify without reading 
 ### Content Transformation
 
 The `content.ts` utilities transform markdown for ATProto compatibility:
+
 - Convert HTML sidenotes → markdown blockquotes
 - Resolve relative links → absolute URLs
 - Extract plain text for search indexing
@@ -113,22 +115,22 @@ All styled using Tailwind v4 with `light-dark()` function.
 import { StandardSitePublisher } from 'svelte-standard-site/publisher';
 
 const publisher = new StandardSitePublisher({
-  identifier: 'you.bsky.social',
-  password: process.env.ATPROTO_APP_PASSWORD!,
+	identifier: 'you.bsky.social',
+	password: process.env.ATPROTO_APP_PASSWORD!
 });
 
 await publisher.login();
 
 await publisher.publishDocument({
-  site: 'https://yourblog.com',
-  title: 'My Post',
-  publishedAt: new Date().toISOString(),
-  content: {
-    $type: 'site.standard.content.markdown',
-    text: markdownContent,
-    version: '1.0',
-  },
-  textContent: plainTextContent,
+	site: 'https://yourblog.com',
+	title: 'My Post',
+	publishedAt: new Date().toISOString(),
+	content: {
+		$type: 'site.standard.content.markdown',
+		text: markdownContent,
+		version: '1.0'
+	},
+	textContent: plainTextContent
 });
 ```
 
@@ -149,13 +151,13 @@ const publications = await client.fetchAllPublications(fetch);
 
 ```svelte
 <script>
-  import { Comments } from 'svelte-standard-site';
+	import { Comments } from 'svelte-standard-site';
 </script>
 
 <Comments
-  bskyPostUri="at://did:plc:xxx/app.bsky.feed.post/abc123"
-  canonicalUrl="https://yourblog.com/posts/my-post"
-  maxDepth={3}
+	bskyPostUri="at://did:plc:xxx/app.bsky.feed.post/abc123"
+	canonicalUrl="https://yourblog.com/posts/my-post"
+	maxDepth={3}
 />
 ```
 
@@ -165,7 +167,7 @@ const publications = await client.fetchAllPublications(fetch);
 import { transformContent } from 'svelte-standard-site/content';
 
 const result = transformContent(rawMarkdown, {
-  baseUrl: 'https://yourblog.com',
+	baseUrl: 'https://yourblog.com'
 });
 
 // result.markdown - cleaned for ATProto
@@ -182,12 +184,12 @@ import { generatePublicationWellKnown } from 'svelte-standard-site/verification'
 import { text } from '@sveltejs/kit';
 
 export function GET() {
-  return text(
-    generatePublicationWellKnown({
-      did: 'did:plc:xxx',
-      publicationRkey: '3abc123xyz',
-    })
-  );
+	return text(
+		generatePublicationWellKnown({
+			did: 'did:plc:xxx',
+			publicationRkey: '3abc123xyz'
+		})
+	);
 }
 ```
 

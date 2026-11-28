@@ -107,11 +107,15 @@
 
 	{#if loading}
 		<div class="text-ink-600 dark:text-ink-400 py-8 text-center">
-			<div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-t-transparent"></div>
+			<div
+				class="border-primary-600 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+			></div>
 			<p class="mt-2">Loading comments...</p>
 		</div>
 	{:else if error}
-		<div class="border-canvas-200 bg-canvas-100 dark:border-canvas-700 dark:bg-canvas-800 rounded-lg border p-4">
+		<div
+			class="border-canvas-200 bg-canvas-100 dark:border-canvas-700 dark:bg-canvas-800 rounded-lg border p-4"
+		>
 			<p class="text-ink-900 dark:text-ink-50 font-medium">Failed to load comments</p>
 			<p class="text-ink-600 dark:text-ink-400 mt-1 text-sm">{error}</p>
 		</div>
@@ -148,7 +152,9 @@
 									class="h-10 w-10 rounded-full"
 								/>
 							{:else}
-								<div class="bg-primary-200 dark:bg-primary-800 flex h-10 w-10 items-center justify-center rounded-full">
+								<div
+									class="bg-primary-200 dark:bg-primary-800 flex h-10 w-10 items-center justify-center rounded-full"
+								>
 									<span class="text-primary-900 dark:text-primary-100 text-sm font-bold">
 										{(comment.author.displayName || comment.author.handle)[0].toUpperCase()}
 									</span>
@@ -212,7 +218,9 @@
 													class="h-8 w-8 rounded-full"
 												/>
 											{:else}
-												<div class="bg-primary-200 dark:bg-primary-800 flex h-8 w-8 items-center justify-center rounded-full">
+												<div
+													class="bg-primary-200 dark:bg-primary-800 flex h-8 w-8 items-center justify-center rounded-full"
+												>
 													<span class="text-primary-900 dark:text-primary-100 text-xs font-bold">
 														{(reply.author.displayName || reply.author.handle)[0].toUpperCase()}
 													</span>
@@ -237,7 +245,9 @@
 										</time>
 									</header>
 
-									<p class="text-ink-900 dark:text-ink-50 mb-2 whitespace-pre-wrap text-sm">{reply.text}</p>
+									<p class="text-ink-900 dark:text-ink-50 mb-2 text-sm whitespace-pre-wrap">
+										{reply.text}
+									</p>
 
 									<footer class="text-ink-600 dark:text-ink-400 flex items-center gap-4 text-xs">
 										{#if reply.likeCount > 0}

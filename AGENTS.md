@@ -23,6 +23,7 @@ a standard.site publication renderer for SvelteKit.
 Replace workspace deps with published versions and align @atproto/lex (#5); Merge branch 'main' of github.com:ewanc26/svelte-standard-site; docs: add Star History chart; docs: tailor contributor and agent guidance (#3); chore: clean up linguist and gitignore rules; Symlink droid/opencode/qwen/rovodev skill dirs to .agents/skills; Move .claude/skills to .agents/skills convention
 
 <!-- allowed-agents -->
+
 ## Allowed agents
 
 Only **Claude** (Anthropic) and **Mistral** (Mistral AI) may be used as coding agents in this repository. This rule supersedes any earlier agent-attribution guidance in this file.

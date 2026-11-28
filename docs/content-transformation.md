@@ -233,7 +233,7 @@ const textContent = stripToPlainText(transformed);
 
 If you want to keep some HTML in the markdown:
 
-```typescript
+````typescript
 function stripToPlainTextPreserveCode(markdown: string): string {
 	// Extract code blocks first
 	const codeBlocks: string[] = [];
@@ -250,7 +250,7 @@ function stripToPlainTextPreserveCode(markdown: string): string {
 
 	return text;
 }
-```
+````
 
 ### Image Alt Text Extraction
 

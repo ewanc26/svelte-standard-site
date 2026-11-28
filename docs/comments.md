@@ -248,16 +248,12 @@ interface CommentAuthor {
 The Comments component uses your site's design system classes. You can customize:
 
 ```svelte
-<Comments
-  {bskyPostUri}
-  {canonicalUrl}
-  class="my-12 rounded-xl border-2 p-6"
-/>
+<Comments {bskyPostUri} {canonicalUrl} class="my-12 rounded-xl border-2 p-6" />
 
 <style>
-  :global(.comments-section) {
-    /* Custom styles */
-  }
+	:global(.comments-section) {
+		/* Custom styles */
+	}
 </style>
 ```
 
@@ -445,10 +441,7 @@ export const load = async ({ params }) => {
 	{@html post.content}
 </article>
 
-<Comments
-	bskyPostUri={post.bskyPostUri}
-	canonicalUrl="https://yourblog.com/posts/my-post"
-/>
+<Comments bskyPostUri={post.bskyPostUri} canonicalUrl="https://yourblog.com/posts/my-post" />
 ```
 
 ### With Loading State
