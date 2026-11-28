@@ -70,12 +70,12 @@ bskyPostUri: at://did:plc:xxx/app.bsky.feed.post/abc123xyz
 
 ```svelte
 <Comments
-  bskyPostUri="at://..."           // Required: AT-URI of announcement post
-  canonicalUrl="https://..."       // Required: URL of your blog post
-  maxDepth={3}                     // Optional: Max reply nesting (default: 3)
-  title="Comments"                 // Optional: Section heading
-  showReplyLink={true}             // Optional: Show "Reply on Bluesky" link
-  class="my-custom-class"          // Optional: Additional CSS classes
+	bskyPostUri="at://..."
+	canonicalUrl="https://..."
+	maxDepth={3}
+	title="Comments"
+	showReplyLink={true}
+	class="my-custom-class"
 />
 ```
 
@@ -248,16 +248,12 @@ interface CommentAuthor {
 The Comments component uses your site's design system classes. You can customize:
 
 ```svelte
-<Comments
-  {bskyPostUri}
-  {canonicalUrl}
-  class="my-12 rounded-xl border-2 p-6"
-/>
+<Comments {bskyPostUri} {canonicalUrl} class="my-12 rounded-xl border-2 p-6" />
 
 <style>
-  :global(.comments-section) {
-    /* Custom styles */
-  }
+	:global(.comments-section) {
+		/* Custom styles */
+	}
 </style>
 ```
 
@@ -445,10 +441,7 @@ export const load = async ({ params }) => {
 	{@html post.content}
 </article>
 
-<Comments
-	bskyPostUri={post.bskyPostUri}
-	canonicalUrl="https://yourblog.com/posts/my-post"
-/>
+<Comments bskyPostUri={post.bskyPostUri} canonicalUrl="https://yourblog.com/posts/my-post" />
 ```
 
 ### With Loading State

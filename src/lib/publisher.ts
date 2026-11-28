@@ -317,9 +317,7 @@ export class StandardSitePublisher {
 		});
 	}
 
-	async listDocuments(
-		limit = 100
-	): Promise<Array<{ uri: string; cid: string; value: Document }>> {
+	async listDocuments(limit = 100): Promise<Array<{ uri: string; cid: string; value: Document }>> {
 		const did = this.getDid();
 		const client = this.getClient();
 

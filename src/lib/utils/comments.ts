@@ -133,10 +133,7 @@ export async function fetchComments(options: FetchCommentsOptions): Promise<Comm
 	}
 }
 
-export async function fetchMentionComments(
-	canonicalUrl: string,
-	maxDepth = 3
-): Promise<Comment[]> {
+export async function fetchMentionComments(canonicalUrl: string, maxDepth = 3): Promise<Comment[]> {
 	try {
 		const client = new Client('https://public.api.bsky.app');
 
