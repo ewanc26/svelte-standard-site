@@ -113,6 +113,14 @@
 						class="text-primary-600 hover:text-primary-700 focus-visible:outline-primary-600 dark:text-primary-400 dark:hover:text-primary-500 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2"
 						>GitHub Sponsors</a
 					>
+					&middot;
+					<a
+						href="https://liberapay.com/ewanc26/"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-primary-600 hover:text-primary-700 focus-visible:outline-primary-600 dark:text-primary-400 dark:hover:text-primary-500 font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2"
+						>Liberapay</a
+					>
 				</p>
 			</div>
 		</footer>
